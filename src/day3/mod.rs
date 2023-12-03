@@ -1,6 +1,9 @@
+use std::collections::{HashSet};
+
 mod consts;
 
 type Schema = Vec<Vec<u8>>;
+type StarCords = (usize, usize);
 
 pub fn compute_number() -> u32 {
     let mut array: Schema = consts::INPUT.trim().lines()
@@ -11,11 +14,36 @@ pub fn compute_number() -> u32 {
     motor_numbers.iter().map(|n| get_number_value(&array, n)).sum()
 }
 
+pub fn compute_gear_ratios() -> u32 {
+    let mut array: Schema = consts::INPUT.trim().lines()
+        .map(|line| line.as_bytes().to_vec())
+        .collect();
+    let mut numbers = find_all_numbers(&array);
+    let star_numbers = numbers.into_iter().filter_map(|n| is_star_part(&array, n)).collect::<Vec<_>>();
+    let mut stars: HashSet<StarCords> = star_numbers.iter().map(|n| n.star.unwrap()).collect();
+    let mut sum: u32 = 0;
+    for star in &stars {
+        let mut ratio: u32 = 1;
+        let mut count: u32 = 0;
+        for n in &star_numbers {
+            if n.star.unwrap() == *star {
+                ratio *= get_number_value(&array, n);
+                count += 1;
+            }
+        }
+        if count == 2 {
+            sum += ratio;
+        }
+    }
+    sum
+}
+
 #[derive(Debug)]
 struct Number {
     row: usize,
     col_start: usize,
-    col_end: usize
+    col_end: usize,
+    star: Option<StarCords>
 }
 
 fn find_all_numbers(schema: &Schema) -> Vec<Number> {
@@ -32,7 +60,8 @@ fn find_all_numbers(schema: &Schema) -> Vec<Number> {
                 numbers.push(Number {
                     row,
                     col_start: start,
-                    col_end: index - 1
+                    col_end: index - 1,
+                    star: None
                 });
                 number_start = None;
             }
@@ -42,11 +71,27 @@ fn find_all_numbers(schema: &Schema) -> Vec<Number> {
             numbers.push(Number {
                 row,
                 col_start: start,
-                col_end: index - 1
+                col_end: index - 1,
+                star: None
             });
         }
     }
     numbers
+}
+
+fn is_star_part(schema: &Schema, mut number: Number) -> Option<Number> {
+    for row in usize_minus_one(number.row)..number.row+2 {
+        for col in usize_minus_one(number.col_start)..number.col_end+2 {
+            if row >= schema.len() || col >= schema[row].len() {
+                continue;
+            }
+            if schema[row][col] == b'*' {
+                number.star = Some((row, col));
+                return Some(number);
+            }
+        }
+    }
+    None
 }
 
 fn is_motor_part(schema: &Schema, number: &Number) -> bool {

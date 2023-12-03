@@ -3,5 +3,5 @@ mod day2;
 mod day3;
 
 fn main() {
-    println!("{}", day3::compute_number());
+    println!("{}", day3::compute_gear_ratios());
 }
