@@ -5,15 +5,14 @@ const GREEN_MAX: u32 = 13;
 const BLUE_MAX: u32 = 14;
 
 pub fn calc_number() -> Result<u32, ()> {
-    let mut sum_ids: u32 = 0;
+    let mut sum_powers: u32 = 0;
     let lines = consts::INPUT.lines();
     for line in lines {
         let game = parse_game(line)?;
-        if validate_game(&game) {
-            sum_ids += game.id;
-        }
+        let cubes = get_min_amount_of_cubes(&game);
+        sum_powers += cubes.red * cubes.green * cubes.blue;
     }
-    Ok(sum_ids)
+    Ok(sum_powers)
 }
 
 struct Turn {
@@ -25,6 +24,26 @@ struct Turn {
 struct Game {
     id: u32,
     turns: Vec<Turn>,
+}
+
+fn get_min_amount_of_cubes(game: &Game) -> Turn {
+    let mut min_turn = Turn {
+        red: 0,
+        green: 0,
+        blue: 0,
+    };
+    for turn in &game.turns {
+        if turn.red > min_turn.red {
+            min_turn.red = turn.red;
+        }
+        if turn.green > min_turn.green {
+            min_turn.green = turn.green;
+        }
+        if turn.blue > min_turn.blue {
+            min_turn.blue = turn.blue;
+        }
+    }
+    min_turn
 }
 
 fn validate_game(game: &Game) -> bool {
