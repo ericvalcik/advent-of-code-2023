@@ -1,9 +1,7 @@
 mod day1;
 mod day2;
+mod day3;
 
 fn main() {
-    match day2::calc_number() {
-        Ok(number) => println!("{}", number),
-        Err(_) => println!("Error"),
-    }
+    println!("{}", day3::compute_number());
 }
