@@ -3,17 +3,23 @@ use std::collections::HashSet;
 mod consts;
 
 pub fn calc_points() -> u32 {
-    let mut points: u32 = 0;
+    let mut games: Vec<Game>= Vec::new();
     let lines = consts::INPUT.trim().lines();
     for line in lines {
-        let game = parse_line(line);
-        points += calc_points_for_game(game);
+        games.push(parse_line(line));
     }
-    points
+    for i in 0..games.len() {
+        let points = calc_points_for_game(&games[i]);
+        for j in i+1..i+(points as usize)+1 {
+            games[j].copies += games[i].copies;
+        }
+    }
+    games.into_iter().map(|g| g.copies).sum()
 }
 
 #[derive(Debug)]
 struct Game {
+    copies: u32,
     winning: Vec<u32>,
     actual: Vec<u32>,
 }
@@ -36,20 +42,16 @@ fn parse_line(line: &str) -> Game {
             Err(_) => continue,
         }
     }
-    Game { winning, actual }
+    Game { copies: 1, winning, actual }
 }
 
-fn calc_points_for_game(game: Game) -> u32 {
+fn calc_points_for_game(game: &Game) -> u32 {
     let mut points: u32 = 0;
-    let winning_set: HashSet<u32> = game.winning.into_iter().collect();
-    let actual_set: HashSet<u32> = game.actual.into_iter().collect();
+    let winning_set: HashSet<u32> = game.winning.clone().into_iter().collect();
+    let actual_set: HashSet<u32> = game.actual.clone().into_iter().collect();
     for num in actual_set {
         if winning_set.contains(&num) {
-            if (points == 0) {
-                points = 1;
-            } else {
-                points *= 2;
-            }
+            points += 1;
         }
     }
     points
