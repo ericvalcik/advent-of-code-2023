@@ -5,7 +5,8 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 fn main() {
-    println!("{}", day7::count_winnings());
+    println!("{}", day8::walk_network());
 }
