@@ -5,20 +5,22 @@ mod consts;
 pub fn walk_network() -> usize {
     let mut lines = consts::INPUT.trim().lines();
     let mut steps = Steps::new(lines.next().unwrap().trim().as_bytes());
+    let mut count: usize = 1;
     lines.next();
 
     let mut network = Network::new(lines);
     println!("{:?}", network.current);
-    loop {
-        if steps.index % 1_000_000 == 0 {
-            println!("step: {}, current: {:?}", steps.index, network.current);
-        }
-        network.walk(&mut steps);
-        if steps.get_index() == 0 && network.current.iter().all(|node| network.nodes[*node].from.ends_with('Z')) {
-            break;
+    for i in 0..network.current.len() {
+        loop {
+            network.walk(&mut steps, i);
+            if network.nodes[network.current[i]].from.ends_with('Z') {
+                println!("{}", steps.index);
+                steps.index = 0;
+                break;
+            }
         }
     }
-    steps.index
+    0
 }
 
 #[derive(Debug)]
@@ -98,14 +100,12 @@ impl Network {
         }
     }
 
-    fn walk(&mut self, steps: &mut Steps) {
+    fn walk(&mut self, steps: &mut Steps, index: usize) {
         let step = steps.next();
-        for current in &mut self.current {
-            *current = match step {
-                'L' => self.nodes[*current].left,
-                'R' => self.nodes[*current].right,
-                _ => panic!("Invalid step: {}", step),
-            };
-        }
+        self.current[index] = match step {
+            'L' => self.nodes[self.current[index]].left,
+            'R' => self.nodes[self.current[index]].right,
+            _ => panic!("Invalid step: {}", step),
+        };
     }
 }
