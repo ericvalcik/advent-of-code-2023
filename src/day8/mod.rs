@@ -2,21 +2,23 @@ use std::str::Lines;
 
 mod consts;
 
-pub fn walk_network() -> u32 {
+pub fn walk_network() -> usize {
     let mut lines = consts::INPUT.trim().lines();
-    let mut count: u32 = 0;
     let mut steps = Steps::new(lines.next().unwrap().trim().as_bytes());
     lines.next();
 
     let mut network = Network::new(lines);
+    println!("{:?}", network.current);
     loop {
-        count += 1;
+        if steps.index % 1_000_000 == 0 {
+            println!("step: {}, current: {:?}", steps.index, network.current);
+        }
         network.walk(&mut steps);
-        if steps.get_index() == 0 && network.current == "ZZZ" {
+        if network.current.iter().all(|node| node.ends_with('Z')) {
             break;
         }
     }
-    count
+    steps.index
 }
 
 #[derive(Debug)]
@@ -46,7 +48,7 @@ impl Steps {
 #[derive(Debug)]
 struct Network {
     nodes: Vec<Node>,
-    current: String,
+    current: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -59,7 +61,6 @@ struct Node {
 impl Network {
     fn new(lines: Lines) -> Self {
         let mut nodes = Vec::new();
-        let current = "AAA".to_string();
         for line in lines {
             let mut parts = line.trim().split(" = ");
             let from = parts.next().unwrap().trim().to_string();
@@ -72,6 +73,7 @@ impl Network {
                 right,
             });
         }
+        let current = nodes.iter().filter(|node| node.from.ends_with('A')).map(|node| node.from.clone()).collect();
         Self {
             nodes,
             current,
@@ -80,11 +82,13 @@ impl Network {
 
     fn walk(&mut self, steps: &mut Steps) {
         let step = steps.next();
-        let node = self.nodes.iter().find(|n| n.from == self.current).unwrap();
-        match step {
-            'L' => self.current = node.left.clone(),
-            'R' => self.current = node.right.clone(),
-            _ => panic!("Invalid step: {}", step),
+        for current in &mut self.current {
+            let node = self.nodes.iter().find(|n| n.from == *current).unwrap();
+            *current = match step {
+                'L' => node.left.clone(),
+                'R' => node.right.clone(),
+                _ => panic!("Invalid step: {}", step),
+            };
         }
     }
 }
