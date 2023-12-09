@@ -8,12 +8,12 @@ pub fn extrapolate_numbers() -> i32 {
         for num in line.split_whitespace() {
             vec.push(num.parse::<i32>().unwrap());
         }
-        sum += predict_number(&mut vec);
+        sum += predict_number(&vec);
     }
     sum
 }
 
-fn predict_number(vec: &mut Vec<i32>) -> i32 {
+fn predict_number(vec: &Vec<i32>) -> i32 {
     if is_all_zeroes(vec) {
         return 0;
     }
@@ -21,8 +21,8 @@ fn predict_number(vec: &mut Vec<i32>) -> i32 {
     for i in 0..vec.len()-1 {
         nested_vec.push(vec[i + 1] - vec[i]);
     }
-    let nested_next_number = predict_number(&mut nested_vec);
-    vec[vec.len() - 1] + nested_next_number
+    let nested_next_number = predict_number(&nested_vec);
+    vec[0] - nested_next_number
 }
 
 fn is_all_zeroes(vec: &Vec<i32>) -> bool {
