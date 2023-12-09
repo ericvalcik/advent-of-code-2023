@@ -6,7 +6,8 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 
 fn main() {
-    println!("{}", day8::walk_network());
+    println!("{}", day9::extrapolate_numbers());
 }
