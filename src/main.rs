@@ -7,7 +7,8 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
+mod day10;
 
 fn main() {
-    println!("{}", day9::extrapolate_numbers());
+    println!("{}", day10::find_furthest());
 }
