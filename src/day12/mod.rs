@@ -1,7 +1,7 @@
 mod consts;
 
 pub fn count_configurations() -> usize {
-    let mut lines = consts::INPUT.trim().lines();
+    let lines = consts::INPUT.trim().lines();
     let mut count: usize = 0;
     // lines.next();
     // let line = lines.next().unwrap();
