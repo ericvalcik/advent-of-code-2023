@@ -8,7 +8,8 @@ mod day7;
 mod day8;
 mod day9;
 mod day10;
+mod day11;
 
 fn main() {
-    println!("{}", day10::find_furthest());
+    println!("{}", day11::calc_distances());
 }
