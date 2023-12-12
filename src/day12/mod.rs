@@ -1,18 +1,30 @@
 mod consts;
+pub mod different_solution;
 
 pub fn count_configurations() -> usize {
-    let lines = consts::INPUT.trim().lines();
+    let lines = consts::EXAMPLE1.trim().lines();
     let mut count: usize = 0;
     // lines.next();
     // let line = lines.next().unwrap();
     for line in lines {
         let mut first_part: Vec<char> = line.split(' ').next().unwrap().trim().chars().collect::<Vec<char>>();
-        let second_part = line.split(' ').last().unwrap().trim().split(',').map(|x| x.parse::<usize>().unwrap()).collect::<Vec<usize>>();
+        let mut second_part = line.split(' ').last().unwrap().trim().split(',').map(|x| x.parse::<usize>().unwrap()).collect::<Vec<usize>>();
+        prepare_part2(&mut first_part, &mut second_part);
         let line_count = init_guessing(&mut first_part, &second_part);
-        println!("{line_count:2} {line}");
+        println!("{line_count:2} {} {}", first_part.iter().collect::<String>(), second_part.iter().map(std::string::ToString::to_string).collect::<String>());
         count += line_count;
     }
     count
+}
+
+fn prepare_part2(line: &mut Vec<char>, nums: &mut Vec<usize>) {
+    let line_copy = line.clone();
+    let nums_copy = nums.clone();
+    for _ in 0..4 {
+        line.push('?');
+        line.append(&mut line_copy.clone());
+        nums.append(&mut nums_copy.clone());
+    }
 }
 
 fn init_guessing(line: &mut Vec<char>, snd_part: &Vec<usize>) -> usize {

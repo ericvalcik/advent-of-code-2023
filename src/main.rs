@@ -10,7 +10,8 @@ mod day9;
 mod day10;
 mod day11;
 mod day12;
+use crate::day12::different_solution;
 
 fn main() {
-    println!("{}", day12::count_configurations());
+    println!("{}", different_solution::count_part2());
 }
