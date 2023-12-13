@@ -10,8 +10,9 @@ mod day9;
 mod day10;
 mod day11;
 mod day12;
-use crate::day12::different_solution;
+mod day13;
+
 
 fn main() {
-    println!("{}", different_solution::count_part2());
+    println!("{}", day13::find_reflections());
 }
