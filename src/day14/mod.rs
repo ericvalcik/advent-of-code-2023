@@ -1,17 +1,33 @@
 mod consts;
 
 pub fn calculate_load() -> usize {
-    let mut map = Map::new(consts::EXAMPLE1.trim());
-    for i in 0..1_000_000_000 {
+    let mut map = Map::new(consts::INPUT.trim());
+    let mut prev_maps: Vec<Map> = Vec::new();
+    let mut i: usize = 0;
+    let mut check = false;
+    while i < 1_000_000_000 {
         if i % 100_000 == 0 {
             println!("{i}");
         }
         map.roll_cycle();
+        if prev_maps.contains(&map) && !check {
+            check = true;
+            println!("Found a cycle at {i}");
+            let cycle_len = i - prev_maps.iter().position(|m| *m == map).unwrap();
+            println!("Cycle length: {}", cycle_len);
+            while i + cycle_len < 1_000_000_000 {
+                i += cycle_len;
+            }
+            i -= cycle_len;
+        }
+        prev_maps.push(map.clone());
+        i += 1;
     }
     map.print_map();
     map.calc_load()
 }
 
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 struct Map  {
     grid: Vec<Vec<char>>,
 }
