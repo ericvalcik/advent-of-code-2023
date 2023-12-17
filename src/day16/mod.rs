@@ -1,14 +1,37 @@
 mod consts;
 
-pub fn count_heated_squares() -> usize {
+
+pub fn get_most_heated_squares() -> usize {
     let input = consts::INPUT.trim();
+    let grid = Grid::new(input);
+    let mut max = 0;
+    for y in 0..grid.tiles.len() {
+        if count_heated_squares(input, 0, y as i32, Direction::Right) > max {
+            max = count_heated_squares(input, 0, y as i32, Direction::Right);
+        }
+        if count_heated_squares(input, (grid.tiles[0].len() - 1) as i32, y as i32, Direction::Left) > max {
+            max = count_heated_squares(input, (grid.tiles[0].len() - 1) as i32, y as i32, Direction::Left);
+        }
+    }
+    for x in 0..grid.tiles[0].len() {
+        if count_heated_squares(input, x as i32, 0, Direction::Down) > max {
+            max = count_heated_squares(input, x as i32, 0, Direction::Down);
+        }
+        if count_heated_squares(input, x as i32, (grid.tiles.len() - 1) as i32, Direction::Up) > max {
+            max = count_heated_squares(input, x as i32, (grid.tiles.len() - 1) as i32, Direction::Up);
+        }
+    }
+    max
+}
+
+pub fn count_heated_squares(input: &str, x: i32, y: i32, direction: Direction) -> usize {
     let mut grid = Grid::new(input);
     grid.reflect(Beam {
-        x: 0,
-        y: 0,
-        direction: Direction::Right,
+        x,
+        y,
+        direction
     });
-    grid.print_grid();
+    // grid.print_grid();
     grid.count_heated_squares()
 }
 

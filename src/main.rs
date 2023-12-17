@@ -17,5 +17,5 @@ mod day16;
 
 
 fn main() {
-    println!("{}", day16::count_heated_squares());
+    println!("{}", day16::get_most_heated_squares());
 }
