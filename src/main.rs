@@ -13,8 +13,9 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
 
 
 fn main() {
-    println!("{}", day15::run_hash_algorithm());
+    println!("{}", day16::count_heated_squares());
 }
