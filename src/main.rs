@@ -14,8 +14,9 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 
 fn main() {
-    println!("{}", day16::get_most_heated_squares());
+    println!("{}", day17::get_cheapest_path());
 }
