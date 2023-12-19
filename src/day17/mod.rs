@@ -27,10 +27,10 @@ pub fn get_cheapest_path() {
             let ndy = ny as i32 - y as i32;
             let node = &map.nodes[ny][nx];
             if (ndx, ndy) == (dx, dy) {
-                if n < 3 {
+                if n < 10 {
                     pq.push((Reverse(w + node.weight), nx, ny, ndx, ndy, n + 1));
                 }
-            } else if (ndx, ndy) != (-dx, -dy) {
+            } else if (ndx, ndy) != (-dx, -dy) && (n > 3 || (dx, dy) == (0, 0)) {
                 pq.push((Reverse(w + node.weight), nx, ny, ndx, ndy, 1));
             }
         }
