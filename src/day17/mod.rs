@@ -1,29 +1,44 @@
 mod consts;
 
-use std::cmp::{min, Reverse};
-use priority_queue::PriorityQueue;
+use std::cmp::Reverse;
+use std::collections::HashSet;
+use std::collections::BinaryHeap;
 
-pub fn get_cheapest_path() -> usize {
-    println!("{}", consts::EXAMPLE1);
-    let mut map = Map::new(consts::EXAMPLE1);
-    let mut pq = map.get_init_pq();
+pub fn get_cheapest_path() {
+    // println!("{}", consts::EXAMPLE1.trim());
+    let mut map = Map::new(consts::INPUT.trim());
+    let mut seen: HashSet<(usize, usize, i32, i32, usize)> = HashSet::new();
+    let mut pq: BinaryHeap<(Reverse<usize>, usize, usize, i32, i32, usize)> = BinaryHeap::new();
+    pq.push((Reverse(0), 0, 0, 0, 0, 0));
     while !pq.is_empty() {
-        let ((x, y), Reverse(w)) = pq.pop().unwrap();
-        for (nx, ny) in  map.get_neighbors(x, y) {
-            if let Some(Reverse(old_w)) = pq.get_priority(&(nx, ny)) {
-                let node = &mut map.nodes[ny][nx];
-                let new_w = min(w + node.weight, *old_w);
-                if node.node_type == NodeType::End {
-                    map.print();
-                    return new_w;
+        let (Reverse(w), x, y, dx, dy, n) = pq.pop().unwrap();
+        if seen.contains(&(x, y, dx, dy, n)) {
+            continue;
+        }
+        seen.insert((x, y, dx, dy, n));
+        if x == map.nodes[0].len() - 1 && y == map.nodes.len() - 1 {
+            map.nodes[y][x].distance = Some(w);
+            map.print();
+            println!("{w}");
+            return;
+        }
+        for (nx, ny) in map.get_neighbors(x, y) {
+            let ndx = nx as i32 - x as i32;
+            let ndy = ny as i32 - y as i32;
+            let node = &map.nodes[ny][nx];
+            if (ndx, ndy) == (dx, dy) {
+                if n < 3 {
+                    pq.push((Reverse(w + node.weight), nx, ny, ndx, ndy, n + 1));
                 }
-                pq.change_priority(&(nx, ny), Reverse(new_w));
-                node.distance = Some(new_w);
+            } else if (ndx, ndy) != (-dx, -dy) {
+                pq.push((Reverse(w + node.weight), nx, ny, ndx, ndy, 1));
             }
         }
+        if map.nodes[y][x].distance.is_some() {
+            continue;
+        }
+        map.nodes[y][x].distance = Some(w);
     }
-    map.print();
-    0
 }
 
 struct Map {
@@ -31,39 +46,21 @@ struct Map {
 }
 
 impl Map {
-    pub fn new(input: &str) -> Map {
+    pub fn new(input: &str) -> Self {
         let mut nodes: Vec<Vec<Node>> = Vec::new();
         for line in input.trim().lines() {
             let mut row = Vec::new();
             for c in line.chars() {
                 row.push(Node {
                     weight: c as usize - 48,
-                    node_type: NodeType::Regular,
                     distance: None,
                 });
             }
             nodes.push(row);
         }
-        nodes[0][0].node_type = NodeType::Start;
-        let last_row = nodes.len() - 1;
-        let last_col = nodes[0].len() - 1;
-        nodes[last_row][last_col].node_type = NodeType::End;
-        Map {
+        Self {
             nodes
         }
-    }
-
-    fn get_init_pq(&self) -> PriorityQueue<(usize, usize), Reverse<usize>> {
-        let mut pq = PriorityQueue::new();
-        for y in 0..self.nodes.len() {
-            for x in 0..self.nodes[0].len() {
-                if self.nodes[y][x].node_type != NodeType::Start {
-                    pq.push((x, y), Reverse(usize::MAX));
-                }
-            }
-        }
-        pq.push((0, 0), Reverse(0));
-        pq
     }
 
     fn get_neighbors(&self, x: usize, y: usize) -> Vec<(usize, usize)> {
@@ -95,23 +92,12 @@ impl Map {
 
 struct Node {
     weight: usize,
-    node_type: NodeType,
-    distance: Option<usize>
+    distance: Option<usize>,
 }
 
 impl Node {
     fn print(&self) {
         print!("{} ", self.weight);
-        match self.distance {
-            Some(d) => print!("{:4} ", d),
-            None => print!("none "),
-        }
+        self.distance.map_or_else(|| print!("none "), |d| print!("{d:<4} "));
     }
-}
-
-#[derive(PartialEq, Eq)]
-enum NodeType {
-    Regular,
-    Start,
-    End,
 }

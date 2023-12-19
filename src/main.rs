@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 mod day1;
 mod day2;
 mod day3;
@@ -18,5 +20,5 @@ mod day17;
 
 
 fn main() {
-    println!("{}", day17::get_cheapest_path());
+     day17::get_cheapest_path();
 }
