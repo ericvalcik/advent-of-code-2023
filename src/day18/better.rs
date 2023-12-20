@@ -24,15 +24,16 @@ fn get_points(input: &str) -> (Vec<(i64, i64)>, i64) {
     let mut count = 0;
     vec.push((x, y));
     for line in input.lines() {
-        let mut split_line = line.split(" ");
-        let dir = split_line.next().unwrap();
-        let num = split_line.next().unwrap().parse::<i64>().unwrap();
+        let mut split_line = line.trim_end_matches(')');
+        split_line = &split_line[split_line.len()-6..];
+        let num = i64::from_str_radix(&split_line[..5], 16).unwrap();
+        let dir = split_line[5..].parse::<i64>().unwrap();
         count += num;
         match dir {
-            "R" => x += num,
-            "L" => x -= num,
-            "U" => y -= num,
-            "D" => y += num,
+            0 => x += num,
+            2 => x -= num,
+            3 => y -= num,
+            1 => y += num,
             _ => panic!("Unknown direction: {dir}")
         }
         vec.push((x, y));
