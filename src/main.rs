@@ -17,8 +17,9 @@ mod day14;
 mod day15;
 mod day16;
 mod day17;
-
+mod day18;
+use crate::day18::better;
 
 fn main() {
-     day17::get_cheapest_path();
+     println!("{}", better::get_area());
 }
