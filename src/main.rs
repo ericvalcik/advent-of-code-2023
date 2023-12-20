@@ -18,8 +18,8 @@ mod day15;
 mod day16;
 mod day17;
 mod day18;
-use crate::day18::better;
+mod day19;
 
 fn main() {
-     println!("{}", better::get_area());
+     println!("{}", day19::accepted_parts());
 }
