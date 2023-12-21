@@ -21,5 +21,5 @@ mod day18;
 mod day19;
 
 fn main() {
-     println!("{}", day19::accepted_parts());
+     println!("{}", day19::part2());
 }
