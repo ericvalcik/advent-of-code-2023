@@ -22,5 +22,5 @@ mod day19;
 mod day20;
 
 fn main() {
-     println!("{}", day20::day20());
+     println!("{:?}", day20::day20());
 }

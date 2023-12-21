@@ -2,7 +2,7 @@ use std::collections::{HashMap, VecDeque};
 
 mod consts;
 
-pub fn day20() -> usize {
+pub fn day20() -> HashMap<String, usize> {
     let input = consts::INPUT.trim();
     let mut modules: HashMap<String, Module> = HashMap::new();
     for line in input.lines() {
@@ -24,18 +24,25 @@ pub fn day20() -> usize {
             }
         }
     }
-    let mut low_pulses: usize = 0;
-    let mut high_pulses: usize = 0;
-    for _ in 0..1000 {
+
+    let mut count = 0;
+    let mut map: HashMap<String, usize> = HashMap::new();
+    loop {
+        count += 1;
         let mut pulses: VecDeque<(String, Pulse, String)> = VecDeque::new();
         pulses.push_back(("button".to_string(), Pulse::Low, "broadcaster".to_string()));
         while !pulses.is_empty() {
             let (from, pulse, to) = pulses.pop_front().unwrap();
             // println!("{} -{} -> {}", from, if pulse == Pulse::Low { "-low" } else { "-high" }, to);
-            match pulse {
-                Pulse::Low => low_pulses += 1,
-                Pulse::High => high_pulses += 1,
+
+            if pulse == Pulse::High && to == "qt" {
+                map.insert(from.clone(), count);
+                println!("{from}: {count}");
+                if map.len() == 4 {
+                    return map;
+                }
             }
+
             if let Some(new_pulses) = process_pulse(&mut modules, &from, &pulse, &to) {
                 for new_pulse in new_pulses {
                     pulses.push_back(new_pulse);
@@ -43,7 +50,6 @@ pub fn day20() -> usize {
             }
         }
     }
-    low_pulses * high_pulses
 }
 
 fn process_pulse(modules: &mut HashMap<String, Module>, from: &String, pulse: &Pulse, to: &String) -> Option<Vec<(String, Pulse, String)>> {
