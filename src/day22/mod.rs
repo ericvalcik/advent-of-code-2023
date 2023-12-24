@@ -14,34 +14,46 @@ pub fn day22() -> usize {
         drop_cube_in_grid(&mut grid, &cube);
     }
     let mut result = 0;
-    'outer: for cube in &grid.cubes {
-        let is_vertical = cube.start.x == cube.end.x && cube.start.y == cube.end.y;
-        if is_vertical {
-            if grid.grid[cube.end.x][cube.end.y][cube.end.z + 1].is_none() {
-                result += 1;
-            }
-            if let Some(index) = grid.grid[cube.end.x][cube.end.y][cube.end.z + 1] {
-                if grid.cubes[index].support_count.unwrap() > 1 {
-                    result += 1;
-                }
-            }
-        } else {
-            for x in cube.start.x..=cube.end.x {
-                for y in cube.start.y..=cube.end.y {
-                    if let Some(index) = grid.grid[x][y][cube.end.z + 1] {
-                        if grid.cubes[index].support_count.unwrap() == 1 {
-                            continue 'outer;
-                        }
+    for cube in 0..grid.cubes.len() {
+        let mut new_grid = grid.clone();
+        new_grid.cubes[cube].support_count = Some(0);
+        result += disintegrate_cube(&mut new_grid, cube) - 1;
+    }
+    result
+}
+
+fn disintegrate_cube(grid: &mut Grid, cube_index: usize) -> usize {
+    let cube = grid.cubes[cube_index].clone();
+    if cube.support_count.unwrap() != 0 {
+        return 0;
+    }
+    let mut result = 1;
+    if cube.start.x == cube.end.x && cube.start.y == cube.end.y {
+        // vertical cube
+        if let Some(index) = grid.grid[cube.start.x][cube.start.y][cube.end.z + 1] {
+            grid.cubes[index].support_count = Some(grid.cubes[index].support_count.unwrap() - 1);
+            result += disintegrate_cube(grid, index);
+        }
+    } else {
+        let mut set: HashSet<usize> = HashSet::new();
+        // horizontal cube
+        for x in cube.start.x..=cube.end.x {
+            for y in cube.start.y..=cube.end.y {
+                if let Some(index) = grid.grid[x][y][cube.end.z + 1] {
+                    if set.contains(&index) {
+                        continue;
                     }
+                    grid.cubes[index].support_count = Some(grid.cubes[index].support_count.unwrap() - 1);
+                    result += disintegrate_cube(grid, index);
+                    set.insert(index);
                 }
             }
-            result += 1;
         }
     }
     result
 }
 
-#[derive(Debug, PartialOrd, PartialEq, Ord, Eq)]
+#[derive(Debug, PartialOrd, PartialEq, Ord, Eq, Clone)]
 struct Coords {
     x: usize,
     y: usize,
@@ -59,7 +71,7 @@ impl Coords {
     }
 }
 
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone)]
 struct Cube {
     start: Coords,
     end: Coords,
@@ -105,6 +117,7 @@ impl Cube {
     }
 }
 
+#[derive(Debug, Clone)]
 struct Grid {
     cubes: Vec<Cube>,
     grid: Vec<Vec<Vec<Option<usize>>>>, // index in cubes
